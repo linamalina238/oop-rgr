@@ -51,10 +51,17 @@ class ComboField(Control):
         self.values = list(values)
         self.width = width
         self.var = tk.StringVar(value=self.values[0] if self.values else "")
+        self.on_change = None
 
     def create(self, parent):
-        return ttk.Combobox(parent, textvariable=self.var, values=self.values,
-                            width=self.width, state="readonly")
+        combo = ttk.Combobox(parent, textvariable=self.var, values=self.values,
+                             width=self.width, state="readonly")
+        combo.bind("<<ComboboxSelected>>", self._on_select)
+        return combo
+
+    def _on_select(self, event):
+        if self.on_change:
+            self.on_change(self.get())
 
     def get(self):
         return self.var.get()
@@ -120,16 +127,22 @@ class ListField(Control):
         self.height = height
         self.width = width
         self.listbox = None
+        self.on_change = None
 
     def create(self, parent):
         frame = tk.Frame(parent)
         self.listbox = tk.Listbox(frame, height=self.height, width=self.width, exportselection=False)
+        self.listbox.bind("<<ListboxSelect>>", self._on_select)
         scroll = tk.Scrollbar(frame, orient=tk.VERTICAL, command=self.listbox.yview)
         self.listbox.config(yscrollcommand=scroll.set)
         self.listbox.pack(side=tk.LEFT)
         scroll.pack(side=tk.RIGHT, fill=tk.Y)
         self.set_items(self.items)
         return frame
+
+    def _on_select(self, event):
+        if self.on_change:
+            self.on_change(self.get())
 
     def set_items(self, items):
         self.items = list(items)

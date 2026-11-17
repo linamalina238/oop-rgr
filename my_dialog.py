@@ -38,9 +38,6 @@ class MyDialog(ABC):
         self.window.wait_visibility()
         self.window.grab_set()
         self.master.wait_window(self.window)
-
-        if isinstance(self.master, tk.Toplevel):
-            self.master.grab_set()
         return self.result
 
     def center(self):
