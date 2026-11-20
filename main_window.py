@@ -163,6 +163,10 @@ class MainWindow:
 
     def on_categories(self):
         CategoriesDialog(self.root, self.book).show_modal()
+        if self.filter and self.filter.category:
+            names = self.book.categories[INCOME] + self.book.categories[EXPENSE]
+            if self.filter.category not in names:
+                self.filter = None
         self.refresh()
 
     def on_filter(self):
@@ -198,6 +202,8 @@ class MainWindow:
         messagebox.showinfo("Експорт", f"Збережено записів: {len(self.shown())}")
 
     def on_open(self):
+        if self.book.changed and messagebox.askyesno("Відкриття", "Зберегти зміни?"):
+            self.on_save()
         path = filedialog.askopenfilename(filetypes=[("JSON", "*.json")], initialdir=BASE_DIR)
         if not path:
             return
